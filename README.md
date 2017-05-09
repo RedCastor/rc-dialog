@@ -14,7 +14,7 @@ bower install rc-dialog --save
 ```
 
 ```javascript
-angular('yourAngularApp',['rcDialog']);
+angular('yourAngularApp',['rcDialog', 'ngDialog', 'ui.bootstrap', 'mm.foundation', 'ngAnimate']);
 ```
 
 <h4>Parameters</h4>
@@ -34,6 +34,7 @@ angular('yourAngularApp',['rcDialog']);
 
 
 <h4>Usage/Example</h4>
+
 ```html
 <!-- Bootstrap -->
 <script type="text/ng-template" id="templateBootstrapId.html">
@@ -49,7 +50,12 @@ angular('yourAngularApp',['rcDialog']);
         <p>{{rcDialogApi.data}}</p>
     </div>
 </script>
-<button type="button" class="btn btn-warning btn-block" rcd-data="{'urlApi':'http://api.com'}" rcd-open="bootstrap" rcd-template-url="templateBootstrapId.html" rcd-backdrop="true">Open Modal Bootstrap</button>
+<button type="button" class="btn btn-warning btn-block" 
+    rcd-data="{'urlApi':'http://api.com'}" 
+    rcd-open="bootstrap" 
+    rcd-template-url="templateBootstrapId.html" 
+    rcd-backdrop="true"
+>Open Modal Bootstrap</button>
 ```
 
 ```html
@@ -67,7 +73,12 @@ angular('yourAngularApp',['rcDialog']);
         <p>{{rcDialogApi.data}}</p>
     </div>
 </script>
-<button type="button" class="button warning expanded" rcd-data="{'urlApi':'http://api.com'}" rcd-open="foundation" rcd-template-url="templateFoundationId.html" rcd-backdrop="true">Open Modal Foundation</button>
+<button type="button" class="button warning expanded" 
+    rcd-data="{'urlApi':'http://api.com'}" 
+    rcd-open="foundation" 
+    rcd-template-url="templateFoundationId.html" 
+    rcd-backdrop="true"
+>Open Modal Foundation</button>
 ```
 
 ```html
@@ -78,9 +89,14 @@ angular('yourAngularApp',['rcDialog']);
     <p>{{rcDialogApi.dialog}}</p>
     <p>{{rcDialogApi.data}}</p>
 </script>
-<button type="button" class="button primary expanded" rcd-data="{'urlApi':'http://api.com'}" rcd-open rcd-template-url="templateId.html" rcd-backdrop="true">Open ngDialog</button>
+<button type="button" class="button primary expanded" 
+    rcd-data="{'urlApi':'http://api.com'}" 
+    rcd-open 
+    rcd-template-url="templateId.html" 
+    rcd-backdrop="true"
+>Open ngDialog</button>
 ```
 
 
-[Demo Bootstrap 3]: http://redcastor.github.io/rc-dialog/demo/bs.html
-[Demo Foundation 6]: http://redcastor.github.io/rc-dialog/demo/zf.html
+[Demo Bootstrap 3]: http://redcastor.github.io/rc-dialog/demo/bs/index.html
+[Demo Foundation 6]: http://redcastor.github.io/rc-dialog/demo/zf/index.html
