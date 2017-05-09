@@ -98,5 +98,5 @@ angular('yourAngularApp',['rcDialog', 'ngDialog', 'ui.bootstrap', 'mm.foundation
 ```
 
 
-[Demo Bootstrap 3]: http://redcastor.github.io/rc-dialog/demo/bs/index.html
-[Demo Foundation 6]: http://redcastor.github.io/rc-dialog/demo/zf/index.html
+[Demo Bootstrap 3]: http://redcastor.github.io/rc-dialog/demo/bs/
+[Demo Foundation 6]: http://redcastor.github.io/rc-dialog/demo/zf/

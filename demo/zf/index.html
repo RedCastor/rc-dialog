@@ -1,0 +1,89 @@
+<!doctype html>
+<html class="no-js" lang="en-US">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Angular Directive Wrapper Modal for ngDialog, ui.bootstrap and mm.foundation.</title>
+
+    <link rel="stylesheet" href="../dist/styles/foundation.css"/>
+    <link rel="stylesheet" href="../dist/styles/ng-dialog.css"/>
+    <link rel="stylesheet" href="../dist/styles/main.css"/>
+
+    <script src="../dist/scripts/jquery.js"></script>
+    <script src="../dist/scripts/angular.js"></script>
+    <script src="../dist/scripts/angular-foundation-6.js"></script>
+    <script src="../dist/scripts/ng-dialog.js"></script>
+
+    <script src="../../dist/rc-dialog.js"></script>
+    <script src="../dist/scripts/main.js"></script>
+
+    <script type="text/javascript">
+        var app = angular.module('app', ['rcDialog', 'ngDialog', 'mm.foundation', 'ngAnimate']);
+
+        'use strict';
+
+
+        app.controller('dialogCtrl', ['$scope', function ($scope) {
+
+        }]);
+    </script>
+</head>
+
+<body data-ng-app="app" >
+<!--[if lt IE 9]>
+<div class="alert alert-warning browserupgrade">
+    You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.
+</div>
+<![endif]-->
+
+<header class="container-fluid header-main">
+    <div class="row">
+        <div class="small-12">
+            <div class="text-center">
+                <h1 class="page-header">RC-DIALOG</h1>
+                <h3>Angular Directive Wrapper Modal for ngDialog, ui.bootstrap and mm.foundation</h3>
+                <a class="button large hollow default" href="https://github.com/RedCastor/rc-dialog"><i class="fa fa-github"></i>&nbsp;&nbsp;View on GitHub</a>
+                <a class="button large hollow default" href="https://github.com/RedCastor/rc-dialog/releases"><i class="fa fa-download"></i>&nbsp;&nbsp;Download</a>
+                <h5 class="version"><small>Currently v1.0.0</small></h5>
+            </div>
+        </div>
+    </div>
+</header>
+<main class="column row">
+    <div ng-controller="dialogCtrl">
+        <div class="row">
+            <p></p>
+        </div>
+        <div class="row">
+            <div class="small-3 small-centered columns">
+                <script type="text/ng-template" id="templateId.html">
+                    <h3>ngDialog Modal</h3>
+                    <p>This is the content of the template for ngDialog</p>
+                    <p>{{rcDialogApi.dialog}}</p>
+                    <p>{{rcDialogApi.data}}</p>
+                </script>
+                <button type="button" class="button primary expanded" rcd-data="{'urlApi':'http://api.com'}" rcd-open rcd-template-url="templateId.html" rcd-backdrop="true">Open ngDialog</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="small-3 small-centered columns">
+                <script type="text/ng-template" id="templateFoundationId.html">
+                    <div class="modal-header">
+                        <button type="button" data-ng-click="rcDialogApi.closeDialog()" class="close-button" aria-label="Close reveal" >
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h3 class="modal-title">Foundation Modal</h3>
+                    </div>
+                    <div class="modal-body">
+                        <p>This is the content of the template for angular foundation</p>
+                        <p>{{rcDialogApi.dialog}}</p>
+                        <p>{{rcDialogApi.data}}</p>
+                    </div>
+                </script>
+                <button type="button" class="button warning expanded" rcd-data="{'urlApi':'http://api.com'}" rcd-open="foundation" rcd-template-url="templateFoundationId.html" rcd-backdrop="true">Open Modal Foundation</button>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>
