@@ -1,0 +1,32 @@
+{
+  "name": "rc-dialog",
+  "version": "1.0.0",
+  "homepage": "https://redcastor.io",
+  "authors": [
+    "Auban le Grelle"
+  ],
+  "description": "",
+  "keywords": [
+    "angular",
+    "redcastor",
+    "angularjs",
+    "directive",
+    "dialog",
+    "modal"
+  ],
+  "main": [
+    "dist/rc-dialog.js",
+    "dist/rc-dialog.css"
+  ],
+  "ignore": [
+    "**/.*",
+    "**/*.txt",
+    ".jscsrc",
+    ".jshintrc",
+    "node_modules",
+    "bower_components"
+  ],
+  "dependencies": {
+    "angular": "~1.6.4"
+  }
+}
