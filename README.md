@@ -20,14 +20,16 @@ angular('yourAngularApp',['rcDialog', 'ngDialog', 'ui.bootstrap', 'mm.foundation
 <h4>Parameters</h4>
 
 - **rcd-open** = Directive. You can add value "bootstrap" or "foundation". no value is for ngDialog.
-- **rcd-template** = String of the modal content
-- **rcd-template-url** = Url template of the modal content
-- **rcd-size** = "tiny", "small", "large", "full"
-- **rcd-animation** = boolean active the animation
-- **rcd-backdrop** = boolean active the backdrop
-- **rcd-esc-close** = boolean active key esc for close
-- **rcd-click-close** = boolean active click outside modal for close
-- **rcd-class** = Add extra class to modal 
+- **rcd-template** = String of the modal content.
+- **rcd-template-url** = Url template of the modal content.
+- **rcd-size** = "tiny", "small", "large", "full".
+- **rcd-animation** = boolean active the animation.
+- **rcd-backdrop** = boolean active the backdrop.
+- **rcd-esc-close** = boolean active key esc for close.
+- **rcd-click-close** = boolean active click outside modal for close.
+- **rcd-auto-close** = Delay auto modal close after open in milisecond.
+- **rcd-class** = Add extra class to modal .
+- **rcd-selected-view** = set the default view string. Default empty string. Possible to use in url with location search = "selectedView=myCurrentView".
 - **rcd-data** = Pass data to modal content. 
   Access in your template with "rcDialogApi.data". 
   Access to your params modal in template with "rcDialogApi.dialog"

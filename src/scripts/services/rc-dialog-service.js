@@ -12,7 +12,7 @@
             var modal = null;
 
 
-            function _open_dialog_modal( dialog, data ) {
+            function _open_dialog_modal( dialog, data, dialog_api ) {
 
                 var width = null;
                 var height = null;
@@ -54,8 +54,10 @@
                         }],
                         rcDialogDataObj: [ function(){
                             return data;
+                        }],
+                        rcDialogApiObj: [ function(){
+                            return dialog_api;
                         }]
-
                     },
                     preCloseCallback: function () {
 
@@ -88,7 +90,7 @@
 
 
             //Bootstrap Modal
-            function _open_bootstrap_modal ( dialog, data ) {
+            function _open_bootstrap_modal ( dialog, data, dialog_api ) {
 
                 var options = {
                     size: (dialog.size === 'large' || dialog.size === 'full') ? 'lg' : 'sm',
@@ -103,6 +105,9 @@
                         }],
                         rcDialogDataObj: [ function(){
                             return data;
+                        }],
+                        rcDialogApiObj: [ function(){
+                            return dialog_api;
                         }]
                     }
                 };
@@ -136,7 +141,7 @@
             }
 
             //Foundation Modal
-            function _open_foundation_modal ( dialog, data ) {
+            function _open_foundation_modal ( dialog, data, dialog_api ) {
 
                 var options = {
                     size: dialog.size,
@@ -151,6 +156,9 @@
                         }],
                         rcDialogDataObj: [ function(){
                             return data;
+                        }],
+                        rcDialogApiObj: [ function(){
+                            return dialog_api;
                         }]
                     }
                 };
@@ -183,7 +191,7 @@
 
 
             //Open new dialog
-            function _open_modal( dialog, data ) {
+            function _open_modal( dialog, data, dialog_api ) {
 
                 switch ( dialog.theme ) {
                     case 'bootstrap':
@@ -191,7 +199,7 @@
                             angular.module('ui.bootstrap');
                             modal = $injector.get('$uibModal');
 
-                            _open_bootstrap_modal( dialog, data );
+                            _open_bootstrap_modal( dialog, data, dialog_api );
                         }
                         catch(err) {
                             $log.error('Error to open dialog with "ui.bootstrap".');
@@ -203,7 +211,7 @@
                             angular.module('mm.foundation');
                             modal = $injector.get('$modal');
 
-                            _open_foundation_modal( dialog, data );
+                            _open_foundation_modal( dialog, data, dialog_api );
                         }
                         catch(err) {
                             $log.error('Error to open dialog with "mm.foundation".');
@@ -215,7 +223,7 @@
                             angular.module('ngDialog');
                             modal = $injector.get('ngDialog');
 
-                            _open_dialog_modal( dialog, data );
+                            _open_dialog_modal( dialog, data, dialog_api );
                         }
                         catch(err) {
                             $log.error('Error to open dialog with "ngDialog".');
@@ -226,8 +234,8 @@
             }
 
             return {
-                open: function ( dialog, data ) {
-                    _open_modal( dialog, data );
+                open: function ( dialog, data, dialog_api ) {
+                    _open_modal( dialog, data, dialog_api );
                 }
             };
 

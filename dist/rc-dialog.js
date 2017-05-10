@@ -18,7 +18,9 @@
                 rcdBackdrop: "=",
                 rcdEscClose: "=",
                 rcdClickClose: "=",
+                rcdAutoClose: "=",
                 rcdClass: "@",
+                rcdSelectedView: "=",
                 rcdData: "=?"
             },
             link: function($scope, elem, attrs) {
@@ -31,11 +33,15 @@
                     backdrop: angular.isDefined($scope.rcdBackdrop) && $scope.rcdBackdrop === "true" ? $scope.rcdBackdrop : true,
                     escClose: angular.isDefined($scope.rcdEscClose) && $scope.rcdEscClose === "true" ? $scope.rcdEscClose : true,
                     clickClose: angular.isDefined($scope.rcdClickClose) && $scope.rcdClickClose === "true" ? $scope.rcdClickClose : true,
+                    autoClose: angular.isDefined($scope.rcdAutoClose) && $scope.rcdAutoClose ? $scope.rcdAutoClose : 0,
                     class: angular.isDefined($scope.rcdClass) ? $scope.rcdClass : ""
                 };
                 var data = angular.isDefined($scope.rcdData) ? $scope.rcdData : null;
+                var dialog_api = {
+                    selectedView: angular.isDefined($scope.rcdSelectedView) ? $scope.rcdSelectedView : ""
+                };
                 elem.bind("click", function() {
-                    rcDialog.open(dialog, data);
+                    rcDialog.open(dialog, data, dialog_api);
                 });
             }
         };
@@ -45,19 +51,74 @@
 (function(angular) {
     "use strict";
     var module = angular.module("rcDialog");
-    module.controller("rcDialogCtrl", [ "$log", "rcDialogObj", "rcDialogDataObj", function($log, rcDialogObj, rcDialogDataObj) {
+    module.controller("rcDialogCtrl", [ "$location", "$timeout", "$log", "rcDialogObj", "rcDialogDataObj", "rcDialogApiObj", function($location, $timeout, $log, rcDialogObj, rcDialogDataObj, rcDialogApiObj) {
+        function get_selected_view() {
+            var search = $location.search();
+            var selected_view = null;
+            if (angular.isDefined(search.selectedView)) {
+                if (angular.isString(search.selectedView)) {
+                    selected_view = search.selectedView;
+                }
+                $location.search("selectedView", null);
+            }
+            return selected_view;
+        }
+        var dialogApi = this;
+        var selectedView = get_selected_view();
+        angular.extend(this, rcDialogApiObj);
         this.dialog = rcDialogObj;
         this.data = rcDialogDataObj;
+        if (!angular.isDefined(this.selectedView)) {
+            this.selectedView = null;
+        }
+        if (selectedView) {
+            this.selectedView = selectedView;
+        }
+        if (angular.isDefined(this.dialog.autoClose) && angular.isNumber(this.dialog.autoClose) && this.dialog.autoClose > 0) {
+            $timeout(function() {
+                dialogApi.closeDialog();
+            }, this.dialog.autoClose);
+        }
         this.closeDialog = function(value) {
             this.closeThisDialog(value);
         };
         this.confirmDialog = function(value) {
             this.confirm(value);
         };
+        this.setSelectedView = function(value) {
+            if (!this.selectedView) {
+                this.selectedView = value;
+            }
+        };
     } ]);
-    module.controller("rcDialogUibCtrl", [ "$log", "rcDialogObj", "rcDialogDataObj", "$uibModalInstance", function($log, rcDialogObj, rcDialogDataObj, $uibModalInstance) {
+    module.controller("rcDialogUibCtrl", [ "$location", "$timeout", "$log", "rcDialogObj", "rcDialogDataObj", "rcDialogApiObj", "$uibModalInstance", function($location, $timeout, $log, rcDialogObj, rcDialogDataObj, rcDialogApiObj, $uibModalInstance) {
+        function get_selected_view() {
+            var search = $location.search();
+            var selected_view = null;
+            if (angular.isDefined(search.selectedView)) {
+                if (angular.isString(search.selectedView)) {
+                    selected_view = search.selectedView;
+                }
+                $location.search("selectedView", null);
+            }
+            return selected_view;
+        }
+        var dialogApi = this;
+        var selectedView = get_selected_view();
+        angular.extend(this, rcDialogApiObj);
         this.dialog = rcDialogObj;
         this.data = rcDialogDataObj;
+        if (!angular.isDefined(this.selectedView)) {
+            this.selectedView = null;
+        }
+        if (selectedView) {
+            this.selectedView = selectedView;
+        }
+        if (angular.isDefined(this.dialog.autoClose) && angular.isNumber(this.dialog.autoClose) && this.dialog.autoClose > 0) {
+            $timeout(function() {
+                dialogApi.closeDialog();
+            }, this.dialog.autoClose);
+        }
         this.closeDialog = function(value) {
             $uibModalInstance.close(value);
         };
@@ -67,10 +128,40 @@
             }
             $uibModalInstance.close(value);
         };
+        this.setSelectedView = function(value) {
+            if (!this.selectedView) {
+                this.selectedView = value;
+            }
+        };
     } ]);
-    module.controller("rcDialogFoundationCtrl", [ "$log", "rcDialogObj", "rcDialogDataObj", "$modalInstance", function($log, rcDialogObj, rcDialogDataObj, $modalInstance) {
+    module.controller("rcDialogFoundationCtrl", [ "$location", "$timeout", "$log", "rcDialogObj", "rcDialogDataObj", "rcDialogApiObj", "$modalInstance", function($location, $timeout, $log, rcDialogObj, rcDialogDataObj, rcDialogApiObj, $modalInstance) {
+        function get_selected_view() {
+            var search = $location.search();
+            var selected_view = null;
+            if (angular.isDefined(search.selectedView)) {
+                if (angular.isString(search.selectedView)) {
+                    selected_view = search.selectedView;
+                }
+                $location.search("selectedView", null);
+            }
+            return selected_view;
+        }
+        var dialogApi = this;
+        var selectedView = get_selected_view();
+        angular.extend(this, rcDialogApiObj);
         this.dialog = rcDialogObj;
         this.data = rcDialogDataObj;
+        if (!angular.isDefined(this.selectedView)) {
+            this.selectedView = null;
+        }
+        if (selectedView) {
+            this.selectedView = selectedView;
+        }
+        if (angular.isDefined(this.dialog.autoClose) && angular.isNumber(this.dialog.autoClose) && this.dialog.autoClose > 0) {
+            $timeout(function() {
+                dialogApi.closeDialog();
+            }, this.dialog.autoClose);
+        }
         this.closeDialog = function(value) {
             $modalInstance.close(value);
         };
@@ -79,6 +170,11 @@
                 value = "confirm_" + value;
             }
             $modalInstance.close(value);
+        };
+        this.setSelectedView = function(value) {
+            if (!this.selectedView) {
+                this.selectedView = value;
+            }
         };
     } ]);
 })(angular, window);
@@ -88,7 +184,7 @@
     var module = angular.module("rcDialog");
     module.factory("rcDialog", [ "$log", "$injector", "$timeout", function($log, $injector, $timeout) {
         var modal = null;
-        function _open_dialog_modal(dialog, data) {
+        function _open_dialog_modal(dialog, data, dialog_api) {
             var width = null;
             var height = null;
             switch (dialog.size) {
@@ -131,6 +227,9 @@
                     } ],
                     rcDialogDataObj: [ function() {
                         return data;
+                    } ],
+                    rcDialogApiObj: [ function() {
+                        return dialog_api;
                     } ]
                 },
                 preCloseCallback: function() {}
@@ -146,7 +245,7 @@
             var modal_instance = modal.openConfirm(options);
             modal_instance.then(function(close) {}, function(confirm) {});
         }
-        function _open_bootstrap_modal(dialog, data) {
+        function _open_bootstrap_modal(dialog, data, dialog_api) {
             var options = {
                 size: dialog.size === "large" || dialog.size === "full" ? "lg" : "sm",
                 animation: dialog.animation,
@@ -160,6 +259,9 @@
                     } ],
                     rcDialogDataObj: [ function() {
                         return data;
+                    } ],
+                    rcDialogApiObj: [ function() {
+                        return dialog_api;
                     } ]
                 }
             };
@@ -176,7 +278,7 @@
             var modal_instance = modal.open(options);
             modal_instance.result.then(function(close) {}, function(dismiss) {});
         }
-        function _open_foundation_modal(dialog, data) {
+        function _open_foundation_modal(dialog, data, dialog_api) {
             var options = {
                 size: dialog.size,
                 backdrop: dialog.backdrop,
@@ -190,6 +292,9 @@
                     } ],
                     rcDialogDataObj: [ function() {
                         return data;
+                    } ],
+                    rcDialogApiObj: [ function() {
+                        return dialog_api;
                     } ]
                 }
             };
@@ -205,13 +310,13 @@
             var modal_instance = modal.open(options);
             modal_instance.result.then(function(close) {}, function(dismiss) {});
         }
-        function _open_modal(dialog, data) {
+        function _open_modal(dialog, data, dialog_api) {
             switch (dialog.theme) {
               case "bootstrap":
                 try {
                     angular.module("ui.bootstrap");
                     modal = $injector.get("$uibModal");
-                    _open_bootstrap_modal(dialog, data);
+                    _open_bootstrap_modal(dialog, data, dialog_api);
                 } catch (err) {
                     $log.error('Error to open dialog with "ui.bootstrap".');
                     $log.error(err);
@@ -222,7 +327,7 @@
                 try {
                     angular.module("mm.foundation");
                     modal = $injector.get("$modal");
-                    _open_foundation_modal(dialog, data);
+                    _open_foundation_modal(dialog, data, dialog_api);
                 } catch (err) {
                     $log.error('Error to open dialog with "mm.foundation".');
                     $log.error(err);
@@ -233,7 +338,7 @@
                 try {
                     angular.module("ngDialog");
                     modal = $injector.get("ngDialog");
-                    _open_dialog_modal(dialog, data);
+                    _open_dialog_modal(dialog, data, dialog_api);
                 } catch (err) {
                     $log.error('Error to open dialog with "ngDialog".');
                     $log.error(err);
@@ -241,8 +346,8 @@
             }
         }
         return {
-            open: function(dialog, data) {
-                _open_modal(dialog, data);
+            open: function(dialog, data, dialog_api) {
+                _open_modal(dialog, data, dialog_api);
             }
         };
     } ]);

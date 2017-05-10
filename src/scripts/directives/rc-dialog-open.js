@@ -18,8 +18,10 @@
                 rcdBackdrop: '=',
                 rcdEscClose: '=',
                 rcdClickClose: '=',
+                rcdAutoClose: '=',
                 rcdClass: '@',
-                rcdData: '=?'
+                rcdSelectedView: '=',
+                rcdData: '=?',
             },
             link: function ($scope, elem, attrs) {
 
@@ -32,13 +34,18 @@
                     backdrop:   angular.isDefined($scope.rcdBackdrop) && $scope.rcdBackdrop === 'true' ? $scope.rcdBackdrop : true,
                     escClose:   angular.isDefined($scope.rcdEscClose) && $scope.rcdEscClose === 'true' ? $scope.rcdEscClose : true,
                     clickClose: angular.isDefined($scope.rcdClickClose)&& $scope.rcdClickClose === 'true' ? $scope.rcdClickClose : true,
+                    autoClose:  angular.isDefined($scope.rcdAutoClose)&& $scope.rcdAutoClose ? $scope.rcdAutoClose : 0,
                     class:      angular.isDefined($scope.rcdClass) ? $scope.rcdClass : ''
                 };
 
                 var data = angular.isDefined($scope.rcdData) ? $scope.rcdData : null;
 
+                var dialog_api = {
+                    selectedView:       angular.isDefined($scope.rcdSelectedView) ? $scope.rcdSelectedView : '',
+                };
+
                 elem.bind('click', function() {
-                    rcDialog.open(dialog, data);
+                    rcDialog.open(dialog, data, dialog_api);
                 });
 
             }
