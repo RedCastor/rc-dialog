@@ -6,8 +6,28 @@
     var module = angular.module('rcDialog');
 
 
-    //Media dialog
-    module.factory('rcDialog', [ '$log', '$injector', '$timeout', function ( $log, $injector, $timeout ) {
+    //Dialog Helper
+    module.factory('rcDialogHelpers', [ '$rootScope', '$log', function($rootScope, $log) {
+
+        //Send event notify
+        function _send_event( name, args ) {
+            name = 'rcDialog:' + name;
+
+            $log.debug('RC Dialog send event: ' + name);
+            $log.debug(args);
+
+            angular.element(document.body).triggerHandler( name, args);
+            $rootScope.$broadcast('rcDialog:' + name, args);
+        }
+
+
+        return {
+            sendEvent: _send_event
+        };
+    }]);
+
+    //Dialog Service
+    module.factory('rcDialog', [ '$log', '$injector', '$timeout', 'rcDialogHelpers', function ( $log, $injector, $timeout, rcDialogHelpers ) {
 
             var modal = null;
 
@@ -78,11 +98,11 @@
                 var modal_instance = modal.openConfirm( options );
 
                 modal_instance.then(
-                    function (close) {
-
-                    },
                     function (confirm) {
-
+                        rcDialogHelpers.sendEvent('confirm', confirm);
+                    },
+                    function (close) {
+                        rcDialogHelpers.sendEvent('close', close);
                     }
                 );
 
@@ -131,11 +151,11 @@
                 var modal_instance = modal.open( options );
 
                 modal_instance.result.then(
-                    function (close) {
-
+                    function (confirm) {
+                        rcDialogHelpers.sendEvent('confirm', confirm);
                     },
-                    function (dismiss) {
-
+                    function (close) {
+                        rcDialogHelpers.sendEvent('close', close);
                     }
                 );
             }
@@ -180,11 +200,11 @@
                 var modal_instance = modal.open( options );
 
                 modal_instance.result.then(
-                    function (close) {
-
+                    function (confirm) {
+                        rcDialogHelpers.sendEvent('confirm', confirm);
                     },
-                    function (dismiss) {
-
+                    function (close) {
+                        rcDialogHelpers.sendEvent('close', close);
                     }
                 );
             }

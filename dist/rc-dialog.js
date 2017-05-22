@@ -51,7 +51,7 @@
 (function(angular) {
     "use strict";
     var module = angular.module("rcDialog");
-    module.controller("rcDialogCtrl", [ "$location", "$timeout", "$log", "rcDialogObj", "rcDialogDataObj", "rcDialogApiObj", function($location, $timeout, $log, rcDialogObj, rcDialogDataObj, rcDialogApiObj) {
+    module.controller("rcDialogCtrl", [ "$scope", "$location", "$timeout", "$log", "rcDialogObj", "rcDialogDataObj", "rcDialogApiObj", function($scope, $location, $timeout, $log, rcDialogObj, rcDialogDataObj, rcDialogApiObj) {
         function get_selected_view() {
             var search = $location.search();
             var selected_view = null;
@@ -80,10 +80,20 @@
             }, this.dialog.autoClose);
         }
         this.closeDialog = function(value) {
-            this.closeThisDialog(value);
+            if (angular.isString(value)) {
+                value = "close_" + value;
+            } else if (angular.isObject(value)) {
+                value.name = "confirm";
+            }
+            $scope.closeThisDialog(value);
         };
         this.confirmDialog = function(value) {
-            this.confirm(value);
+            if (angular.isString(value)) {
+                value = "confirm_" + value;
+            } else if (angular.isObject(value)) {
+                value.name = "confirm";
+            }
+            $scope.confirm(value);
         };
         this.setSelectedView = function(value) {
             if (!this.selectedView) {
@@ -91,7 +101,7 @@
             }
         };
     } ]);
-    module.controller("rcDialogUibCtrl", [ "$location", "$timeout", "$log", "rcDialogObj", "rcDialogDataObj", "rcDialogApiObj", "$uibModalInstance", function($location, $timeout, $log, rcDialogObj, rcDialogDataObj, rcDialogApiObj, $uibModalInstance) {
+    module.controller("rcDialogUibCtrl", [ "$scope", "$location", "$timeout", "$log", "rcDialogObj", "rcDialogDataObj", "rcDialogApiObj", "$uibModalInstance", function($scope, $location, $timeout, $log, rcDialogObj, rcDialogDataObj, rcDialogApiObj, $uibModalInstance) {
         function get_selected_view() {
             var search = $location.search();
             var selected_view = null;
@@ -120,11 +130,18 @@
             }, this.dialog.autoClose);
         }
         this.closeDialog = function(value) {
-            $uibModalInstance.close(value);
+            if (angular.isString(value)) {
+                value = "close_" + value;
+            } else if (angular.isObject(value)) {
+                value.name = "close";
+            }
+            $uibModalInstance.dismiss(value);
         };
         this.confirmDialog = function(value) {
             if (angular.isString(value)) {
                 value = "confirm_" + value;
+            } else if (angular.isObject(value)) {
+                value.name = "confirm";
             }
             $uibModalInstance.close(value);
         };
@@ -134,7 +151,7 @@
             }
         };
     } ]);
-    module.controller("rcDialogFoundationCtrl", [ "$location", "$timeout", "$log", "rcDialogObj", "rcDialogDataObj", "rcDialogApiObj", "$modalInstance", function($location, $timeout, $log, rcDialogObj, rcDialogDataObj, rcDialogApiObj, $modalInstance) {
+    module.controller("rcDialogFoundationCtrl", [ "$scope", "$location", "$timeout", "$log", "rcDialogObj", "rcDialogDataObj", "rcDialogApiObj", "$modalInstance", function($scope, $location, $timeout, $log, rcDialogObj, rcDialogDataObj, rcDialogApiObj, $modalInstance) {
         function get_selected_view() {
             var search = $location.search();
             var selected_view = null;
@@ -163,11 +180,18 @@
             }, this.dialog.autoClose);
         }
         this.closeDialog = function(value) {
-            $modalInstance.close(value);
+            if (angular.isString(value)) {
+                value = "close_" + value;
+            } else if (angular.isObject(value)) {
+                value.name = "close";
+            }
+            $modalInstance.dismiss(value);
         };
         this.confirmDialog = function(value) {
             if (angular.isString(value)) {
                 value = "confirm_" + value;
+            } else if (angular.isObject(value)) {
+                value.name = "confirm";
             }
             $modalInstance.close(value);
         };
@@ -182,7 +206,19 @@
 (function(angular) {
     "use strict";
     var module = angular.module("rcDialog");
-    module.factory("rcDialog", [ "$log", "$injector", "$timeout", function($log, $injector, $timeout) {
+    module.factory("rcDialogHelpers", [ "$rootScope", "$log", function($rootScope, $log) {
+        function _send_event(name, args) {
+            name = "rcDialog:" + name;
+            $log.debug("RC Dialog send event: " + name);
+            $log.debug(args);
+            angular.element(document.body).triggerHandler(name, args);
+            $rootScope.$broadcast("rcDialog:" + name, args);
+        }
+        return {
+            sendEvent: _send_event
+        };
+    } ]);
+    module.factory("rcDialog", [ "$log", "$injector", "$timeout", "rcDialogHelpers", function($log, $injector, $timeout, rcDialogHelpers) {
         var modal = null;
         function _open_dialog_modal(dialog, data, dialog_api) {
             var width = null;
@@ -243,7 +279,11 @@
             }
             options.appendClassName = "rc-dialog " + dialog.class;
             var modal_instance = modal.openConfirm(options);
-            modal_instance.then(function(close) {}, function(confirm) {});
+            modal_instance.then(function(confirm) {
+                rcDialogHelpers.sendEvent("confirm", confirm);
+            }, function(close) {
+                rcDialogHelpers.sendEvent("close", close);
+            });
         }
         function _open_bootstrap_modal(dialog, data, dialog_api) {
             var options = {
@@ -276,7 +316,11 @@
             options.windowClass = "rc-dialog-uibdialog " + dialog.class;
             options.backdropClass = "rc-dialog-uibdialog-backdrop " + dialog.class;
             var modal_instance = modal.open(options);
-            modal_instance.result.then(function(close) {}, function(dismiss) {});
+            modal_instance.result.then(function(confirm) {
+                rcDialogHelpers.sendEvent("confirm", confirm);
+            }, function(close) {
+                rcDialogHelpers.sendEvent("close", close);
+            });
         }
         function _open_foundation_modal(dialog, data, dialog_api) {
             var options = {
@@ -308,7 +352,11 @@
             }
             options.windowClass = "rc-dialog-zfdialog " + dialog.class;
             var modal_instance = modal.open(options);
-            modal_instance.result.then(function(close) {}, function(dismiss) {});
+            modal_instance.result.then(function(confirm) {
+                rcDialogHelpers.sendEvent("confirm", confirm);
+            }, function(close) {
+                rcDialogHelpers.sendEvent("close", close);
+            });
         }
         function _open_modal(dialog, data, dialog_api) {
             switch (dialog.theme) {

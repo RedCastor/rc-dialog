@@ -4,7 +4,7 @@
   var module = angular.module('rcDialog');
 
   //ngDialog Modal Controller
-    module.controller('rcDialogCtrl', ['$location', '$timeout', '$log', 'rcDialogObj', 'rcDialogDataObj', 'rcDialogApiObj', function ( $location, $timeout, $log, rcDialogObj, rcDialogDataObj, rcDialogApiObj) {
+    module.controller('rcDialogCtrl', ['$scope', '$location', '$timeout', '$log', 'rcDialogObj', 'rcDialogDataObj', 'rcDialogApiObj', function ( $scope, $location, $timeout, $log, rcDialogObj, rcDialogDataObj, rcDialogApiObj) {
 
       function get_selected_view() {
           var search = $location.search();
@@ -45,11 +45,23 @@
       }
 
       this.closeDialog = function ( value ) {
-        this.closeThisDialog( value );
+        if ( angular.isString(value) ) {
+            value = 'close_' + value;
+        }
+        else if ( angular.isObject(value) ) {
+            value.name = 'confirm';
+        }
+        $scope.closeThisDialog( value );
       };
 
       this.confirmDialog = function ( value ) {
-        this.confirm( value );
+        if ( angular.isString(value) ) {
+            value = 'confirm_' + value;
+        }
+        else if ( angular.isObject(value) ) {
+            value.name = 'confirm';
+        }
+        $scope.confirm( value );
       };
 
       this.setSelectedView = function ( value ) {
@@ -63,7 +75,7 @@
 
 
   //UI Bootstrap Modal Controller
-    module.controller('rcDialogUibCtrl', ['$location', '$timeout', '$log', 'rcDialogObj', 'rcDialogDataObj', 'rcDialogApiObj', '$uibModalInstance', function ($location, $timeout, $log, rcDialogObj, rcDialogDataObj, rcDialogApiObj, $uibModalInstance) {
+    module.controller('rcDialogUibCtrl', ['$scope', '$location', '$timeout', '$log', 'rcDialogObj', 'rcDialogDataObj', 'rcDialogApiObj', '$uibModalInstance', function ($scope, $location, $timeout, $log, rcDialogObj, rcDialogDataObj, rcDialogApiObj, $uibModalInstance) {
 
       function get_selected_view() {
           var search = $location.search();
@@ -105,12 +117,21 @@
 
 
       this.closeDialog = function ( value ) {
-        $uibModalInstance.close( value );
+        if ( angular.isString(value) ) {
+            value = 'close_' + value;
+        }
+        else if ( angular.isObject(value) ) {
+            value.name = 'close';
+        }
+        $uibModalInstance.dismiss( value );
       };
 
       this.confirmDialog = function ( value ) {
         if ( angular.isString(value) ) {
           value = 'confirm_' + value;
+        }
+        else if ( angular.isObject(value) ) {
+            value.name = 'confirm';
         }
         $uibModalInstance.close(value);
       };
@@ -126,7 +147,7 @@
 
 
   //Foundation6 Modal Controller
-    module.controller('rcDialogFoundationCtrl', ['$location', '$timeout', '$log', 'rcDialogObj', 'rcDialogDataObj', 'rcDialogApiObj', '$modalInstance', function ($location, $timeout, $log, rcDialogObj, rcDialogDataObj, rcDialogApiObj, $modalInstance) {
+    module.controller('rcDialogFoundationCtrl', ['$scope', '$location', '$timeout', '$log', 'rcDialogObj', 'rcDialogDataObj', 'rcDialogApiObj', '$modalInstance', function ($scope, $location, $timeout, $log, rcDialogObj, rcDialogDataObj, rcDialogApiObj, $modalInstance) {
 
       function get_selected_view() {
           var search = $location.search();
@@ -167,12 +188,21 @@
       }
 
       this.closeDialog = function ( value ) {
-        $modalInstance.close( value );
+          if ( angular.isString(value) ) {
+              value = 'close_' + value;
+          }
+          else if ( angular.isObject(value) ) {
+              value.name = 'close';
+          }
+          $modalInstance.dismiss( value );
       };
 
       this.confirmDialog = function ( value ) {
         if ( angular.isString(value) ) {
           value = 'confirm_' + value;
+        }
+        else if ( angular.isObject(value) ) {
+            value.name = 'confirm';
         }
         $modalInstance.close(value);
       };

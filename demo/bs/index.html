@@ -44,7 +44,7 @@
                 <h3>Angular Directive Wrapper Modal for ngDialog, ui.bootstrap and mm.foundation</h3>
                 <a class="btn btn-default btn-lg" href="https://github.com/RedCastor/rc-dialog"><i class="fa fa-github"></i>&nbsp;&nbsp;View on GitHub</a>
                 <a class="btn btn-default btn-lg" href="https://github.com/RedCastor/rc-dialog/releases"><i class="fa fa-download"></i>&nbsp;&nbsp;Download</a>
-                <h5 class="version"><small>Currently v1.0.1</small></h5>
+                <h5 class="version"><small>Currently v1.0.3</small></h5>
             </div>
         </div>
     </div>
@@ -60,6 +60,10 @@
                     <h3>ngDialog Modal</h3>
                     <p>This is the content of the template for ngDialog</p>
                     <pre json-pretty data="rcDialogApi"></pre>
+                    <p>
+                        <button type="button" class="ngdialog-button" data-ng-click="rcDialogApi.closeDialog()">Close</button>
+                        <button type="button" class="ngdialog-button" data-ng-click="rcDialogApi.confirmDialog()">Confirm</button>
+                    </p>
                 </script>
                 <button type="button" class="btn btn-primary btn-block" rcd-data="{'urlApi':'http://api.com'}" rcd-open rcd-template-url="templateId.html" rcd-backdrop="true">Open ngDialog</button>
             </div>
@@ -77,6 +81,10 @@
                     <div class="modal-body">
                         <p>This is the content of the template for angular bootstrap</p>
                         <pre json-pretty data="rcDialogApi"></pre>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-ng-click="rcDialogApi.closeDialog()">Close</button>
+                        <button type="button" class="btn btn-default" data-ng-click="rcDialogApi.confirmDialog()">Confirm</button>
                     </div>
                 </script>
                 <button type="button" class="btn btn-warning btn-block" rcd-data="{'urlApi':'http://api.com'}" rcd-open="bootstrap" rcd-template-url="templateBootstrapId.html" rcd-backdrop="true">Open Modal Bootstrap</button>

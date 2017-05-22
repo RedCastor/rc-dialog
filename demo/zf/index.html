@@ -45,7 +45,7 @@
                 <h3>Angular Directive Wrapper Modal for ngDialog, ui.bootstrap and mm.foundation</h3>
                 <a class="button large hollow default" href="https://github.com/RedCastor/rc-dialog"><i class="fa fa-github"></i>&nbsp;&nbsp;View on GitHub</a>
                 <a class="button large hollow default" href="https://github.com/RedCastor/rc-dialog/releases"><i class="fa fa-download"></i>&nbsp;&nbsp;Download</a>
-                <h5 class="version"><small>Currently v1.0.1</small></h5>
+                <h5 class="version"><small>Currently v1.0.3</small></h5>
             </div>
         </div>
     </div>
@@ -61,6 +61,10 @@
                     <h3>ngDialog Modal</h3>
                     <p>This is the content of the template for ngDialog</p>
                     <pre json-pretty data="rcDialogApi"></pre>
+                    <p>
+                        <button type="button" class="ngdialog-button" data-ng-click="rcDialogApi.closeDialog()">Close</button>
+                        <button type="button" class="ngdialog-button" data-ng-click="rcDialogApi.confirmDialog()">Confirm</button>
+                    </p>
                 </script>
                 <button type="button" class="button primary expanded" rcd-data="{'urlApi':'http://api.com'}" rcd-open rcd-template-url="templateId.html" rcd-backdrop="true">Open ngDialog</button>
             </div>
@@ -68,15 +72,19 @@
         <div class="row">
             <div class="small-3 small-centered columns">
                 <script type="text/ng-template" id="templateFoundationId.html">
-                    <div class="modal-header">
+                    <div class="dialog-header">
                         <button type="button" data-ng-click="rcDialogApi.closeDialog()" class="close-button" aria-label="Close reveal" >
                             <span aria-hidden="true">&times;</span>
                         </button>
-                        <h3 class="modal-title">Foundation Modal</h3>
+                        <h3 class="dialog-title">Foundation Modal</h3>
                     </div>
-                    <div class="modal-body">
+                    <div class="dialog-body">
                         <p>This is the content of the template for angular foundation</p>
                         <pre json-pretty data="rcDialogApi"></pre>
+                    </div>
+                    <div class="dialog-footer">
+                        <button type="button" class="button" data-ng-click="rcDialogApi.closeDialog()">Close</button>
+                        <button type="button" class="button" data-ng-click="rcDialogApi.confirmDialog()">Confirm</button>
                     </div>
                 </script>
                 <button type="button" class="button warning expanded" rcd-auto-close="3000" rcd-data="{'urlApi':'http://api.com'}" rcd-open="foundation" rcd-template-url="templateFoundationId.html" rcd-backdrop="true">Open Modal Foundation</button>
