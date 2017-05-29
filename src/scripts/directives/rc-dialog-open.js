@@ -30,10 +30,10 @@
                     template:   angular.isDefined($scope.rcdTemplate) ? $scope.rcdTemplate : '',
                     templateUrl:angular.isDefined($scope.rcdTemplateUrl) ? $scope.rcdTemplateUrl : '',
                     size:       angular.isDefined($scope.rcdSize) ? $scope.rcdSize : 'large',
-                    animation:  angular.isDefined($scope.rcdAnimation) && $scope.rcdAnimation === 'true' ? $scope.rcdAnimation : true,
-                    backdrop:   angular.isDefined($scope.rcdBackdrop) && $scope.rcdBackdrop === 'true' ? $scope.rcdBackdrop : true,
-                    escClose:   angular.isDefined($scope.rcdEscClose) && $scope.rcdEscClose === 'true' ? $scope.rcdEscClose : true,
-                    clickClose: angular.isDefined($scope.rcdClickClose)&& $scope.rcdClickClose === 'true' ? $scope.rcdClickClose : true,
+                    animation:  angular.isDefined($scope.rcdAnimation) ? $scope.rcdAnimation : true,
+                    backdrop:   angular.isDefined($scope.rcdBackdrop) ? $scope.rcdBackdrop : true,
+                    escClose:   angular.isDefined($scope.rcdEscClose) ? $scope.rcdEscClose : true,
+                    clickClose: angular.isDefined($scope.rcdClickClose) ? $scope.rcdClickClose : true,
                     autoClose:  angular.isDefined($scope.rcdAutoClose)&& $scope.rcdAutoClose ? $scope.rcdAutoClose : 0,
                     class:      angular.isDefined($scope.rcdClass) ? $scope.rcdClass : ''
                 };
