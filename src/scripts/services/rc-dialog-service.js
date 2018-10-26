@@ -138,6 +138,8 @@
 
                 options.appendClassName = 'rc-dialog ' + dialog.class;
 
+                options = angular.extend(dialog.themeOptions, options);
+
                 var modal_instance = modal.openConfirm( options );
 
                 modal_instance.then(
@@ -191,6 +193,8 @@
                 options.windowClass = 'rc-dialog-uibdialog ' + dialog.class;
                 options.backdropClass = 'rc-dialog-uibdialog-backdrop ' + dialog.class;
 
+                options = angular.extend(dialog.themeOptions, options);
+
                 //Modal Open
                 var modal_instance = modal.open( options );
 
@@ -242,6 +246,8 @@
 
                 options.windowClass = 'rc-dialog-zfdialog ' + dialog.class;
 
+                options = angular.extend(dialog.themeOptions, options);
+
                 //Modal Open
                 var modal_instance = modal.open( options );
 
@@ -262,7 +268,7 @@
             function _open_modal( dialog, data, dialog_api ) {
 
                 var deferred = $q.defer();
-                var result;
+                var result = {};
 
                 switch ( dialog.theme ) {
                     case 'bootstrap':

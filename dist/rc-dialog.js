@@ -11,6 +11,7 @@
             restrict: "EAC",
             replace: false,
             scope: {
+                rcdThemeOptions: "<",
                 rcdTemplate: "@",
                 rcdTemplateUrl: "@",
                 rcdSize: "@",
@@ -24,11 +25,14 @@
                 rcdData: "=?",
                 rcdTrigger: "@",
                 rcdTriggerValue: "@",
-                rcdTriggerDisabled: "<"
+                rcdTriggerDisabled: "<",
+                onConfirm: "&rcdOnConfirm",
+                onClose: "&rcdOnClose"
             },
             link: function($scope, elem, attrs) {
                 var dialog = {
                     theme: angular.isDefined(attrs.rcdOpen) ? attrs.rcdOpen : "",
+                    themeOptions: angular.isObject($scope.rcdThemeOptions) ? $scope.rcdThemeOptions : {},
                     template: angular.isDefined($scope.rcdTemplate) ? $scope.rcdTemplate : "",
                     templateUrl: angular.isDefined($scope.rcdTemplateUrl) ? $scope.rcdTemplateUrl : "",
                     size: angular.isDefined($scope.rcdSize) ? $scope.rcdSize : "large",
@@ -55,21 +59,25 @@
                 elem.bind("click", function() {
                     dialog.open = true;
                     rcDialog.open(dialog, data, dialog_api).then(function(response) {
-                        console.log(response);
-                        console.log(dialog);
+                        $scope.onConfirm({
+                            $confirm: response
+                        });
                     }, function(response) {
-                        console.log(response);
-                        console.log(dialog);
+                        $scope.onClose({
+                            $close: response
+                        });
                     });
                     dialog.open = false;
                 });
                 if (dialog.trigger.type) {
                     rcDialog.open(dialog, data, dialog_api).then(function(response) {
-                        console.log(response);
-                        console.log(dialog);
+                        $scope.onConfirm({
+                            $confirm: response
+                        });
                     }, function(response) {
-                        console.log(response);
-                        console.log(dialog);
+                        $scope.onClose({
+                            $close: response
+                        });
                     });
                 }
                 $scope.$on("$destroy", function handleDestroyEvent() {
@@ -346,6 +354,7 @@
                 options.plain = false;
             }
             options.appendClassName = "rc-dialog " + dialog.class;
+            options = angular.extend(dialog.themeOptions, options);
             var modal_instance = modal.openConfirm(options);
             modal_instance.then(function(confirm) {
                 rcDialogHelpers.sendEvent("confirm", confirm);
@@ -384,6 +393,7 @@
             }
             options.windowClass = "rc-dialog-uibdialog " + dialog.class;
             options.backdropClass = "rc-dialog-uibdialog-backdrop " + dialog.class;
+            options = angular.extend(dialog.themeOptions, options);
             var modal_instance = modal.open(options);
             modal_instance.result.then(function(confirm) {
                 rcDialogHelpers.sendEvent("confirm", confirm);
@@ -421,6 +431,7 @@
                 options.backdrop = "static";
             }
             options.windowClass = "rc-dialog-zfdialog " + dialog.class;
+            options = angular.extend(dialog.themeOptions, options);
             var modal_instance = modal.open(options);
             modal_instance.result.then(function(confirm) {
                 rcDialogHelpers.sendEvent("confirm", confirm);
@@ -431,7 +442,7 @@
         }
         function _open_modal(dialog, data, dialog_api) {
             var deferred = $q.defer();
-            var result;
+            var result = {};
             switch (dialog.theme) {
               case "bootstrap":
                 try {

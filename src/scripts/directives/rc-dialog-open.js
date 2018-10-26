@@ -11,6 +11,7 @@
             restrict: "EAC",
             replace: false,
             scope: {
+                rcdThemeOptions: '<',
                 rcdTemplate: '@',
                 rcdTemplateUrl: '@',
                 rcdSize: '@',
@@ -24,12 +25,15 @@
                 rcdData: '=?',
                 rcdTrigger: '@',
                 rcdTriggerValue: '@',
-                rcdTriggerDisabled: '<'
+                rcdTriggerDisabled: '<',
+                onConfirm: "&rcdOnConfirm",
+                onClose: "&rcdOnClose"
             },
             link: function ($scope, elem, attrs) {
 
                 var dialog = {
                     theme:      angular.isDefined(attrs.rcdOpen) ? attrs.rcdOpen : '',
+                    themeOptions: angular.isObject($scope.rcdThemeOptions) ? $scope.rcdThemeOptions : {},
                     template:   angular.isDefined($scope.rcdTemplate) ? $scope.rcdTemplate : '',
                     templateUrl:angular.isDefined($scope.rcdTemplateUrl) ? $scope.rcdTemplateUrl : '',
                     size:       angular.isDefined($scope.rcdSize) ? $scope.rcdSize : 'large',
@@ -54,7 +58,7 @@
                 var data = angular.isDefined($scope.rcdData) ? $scope.rcdData : null;
 
                 var dialog_api = {
-                    selectedView:       angular.isDefined($scope.rcdSelectedView) ? $scope.rcdSelectedView : '',
+                    selectedView: angular.isDefined($scope.rcdSelectedView) ? $scope.rcdSelectedView : '',
                 };
 
                 //Open on click
@@ -62,8 +66,8 @@
                     dialog.open = true;
 
                     rcDialog.open(dialog, data, dialog_api).then(
-                        function(response) {console.log(response); console.log(dialog);},
-                        function (response) {console.log(response); console.log(dialog);}
+                        function(response) { $scope.onConfirm({$confirm: response}); },
+                        function (response) { $scope.onClose({$close: response}); }
                     );
 
                     dialog.open = false;
@@ -72,8 +76,8 @@
                 //Open on trriger
                 if (dialog.trigger.type) {
                     rcDialog.open(dialog, data, dialog_api).then(
-                        function(response) {console.log(response); console.log(dialog);},
-                        function (response) {console.log(response); console.log(dialog);}
+                        function(response) { $scope.onConfirm({$confirm: response}); },
+                        function (response) { $scope.onClose({$close: response}); }
                     );
                 }
 
