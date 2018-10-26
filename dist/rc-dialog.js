@@ -8,7 +8,7 @@
     var module = angular.module("rcDialog");
     module.directive("rcdOpen", [ "rcDialog", function(rcDialog) {
         return {
-            restrict: "AC",
+            restrict: "EAC",
             replace: false,
             scope: {
                 rcdTemplate: "@",
@@ -21,7 +21,10 @@
                 rcdAutoClose: "=",
                 rcdClass: "@",
                 rcdSelectedView: "=",
-                rcdData: "=?"
+                rcdData: "=?",
+                rcdTrigger: "@",
+                rcdTriggerValue: "@",
+                rcdTriggerDisabled: "<"
             },
             link: function($scope, elem, attrs) {
                 var dialog = {
@@ -33,15 +36,44 @@
                     backdrop: angular.isDefined($scope.rcdBackdrop) ? $scope.rcdBackdrop : true,
                     escClose: angular.isDefined($scope.rcdEscClose) ? $scope.rcdEscClose : true,
                     clickClose: angular.isDefined($scope.rcdClickClose) ? $scope.rcdClickClose : true,
-                    autoClose: angular.isDefined($scope.rcdAutoClose) && $scope.rcdAutoClose ? $scope.rcdAutoClose : 0,
-                    class: angular.isDefined($scope.rcdClass) ? $scope.rcdClass : ""
+                    autoClose: angular.isDefined($scope.rcdAutoClose) && parseInt($scope.rcdAutoClose, 10) ? $scope.rcdAutoClose : 0,
+                    class: angular.isDefined($scope.rcdClass) ? $scope.rcdClass : "",
+                    trigger: {
+                        type: angular.isString($scope.rcdTrigger) ? $scope.rcdTrigger : undefined,
+                        val: angular.isDefined($scope.rcdTriggerValue) ? parseInt($scope.rcdTriggerValue, 10) : 0,
+                        disabled: !$scope.rcdTriggerDisabled ? false : true
+                    },
+                    open: false
                 };
+                if (attrs.id) {
+                    dialog.id = attrs.id;
+                }
                 var data = angular.isDefined($scope.rcdData) ? $scope.rcdData : null;
                 var dialog_api = {
                     selectedView: angular.isDefined($scope.rcdSelectedView) ? $scope.rcdSelectedView : ""
                 };
                 elem.bind("click", function() {
-                    rcDialog.open(dialog, data, dialog_api);
+                    dialog.open = true;
+                    rcDialog.open(dialog, data, dialog_api).then(function(response) {
+                        console.log(response);
+                        console.log(dialog);
+                    }, function(response) {
+                        console.log(response);
+                        console.log(dialog);
+                    });
+                    dialog.open = false;
+                });
+                if (dialog.trigger.type) {
+                    rcDialog.open(dialog, data, dialog_api).then(function(response) {
+                        console.log(response);
+                        console.log(dialog);
+                    }, function(response) {
+                        console.log(response);
+                        console.log(dialog);
+                    });
+                }
+                $scope.$on("$destroy", function handleDestroyEvent() {
+                    rcDialog.destroy(dialog);
                 });
             }
         };
@@ -63,7 +95,7 @@
             }
             return selected_view;
         }
-        var dialogApi = this;
+        var rcDialogApi = this;
         var selectedView = get_selected_view();
         angular.extend(this, rcDialogApiObj);
         this.dialog = rcDialogObj;
@@ -76,7 +108,7 @@
         }
         if (angular.isDefined(this.dialog.autoClose) && angular.isNumber(this.dialog.autoClose) && this.dialog.autoClose > 0) {
             $timeout(function() {
-                dialogApi.closeDialog();
+                rcDialogApi.closeDialog();
             }, this.dialog.autoClose);
         }
         this.closeDialog = function(value) {
@@ -113,7 +145,7 @@
             }
             return selected_view;
         }
-        var dialogApi = this;
+        var rcDialogApi = this;
         var selectedView = get_selected_view();
         angular.extend(this, rcDialogApiObj);
         this.dialog = rcDialogObj;
@@ -126,7 +158,7 @@
         }
         if (angular.isDefined(this.dialog.autoClose) && angular.isNumber(this.dialog.autoClose) && this.dialog.autoClose > 0) {
             $timeout(function() {
-                dialogApi.closeDialog();
+                rcDialogApi.closeDialog();
             }, this.dialog.autoClose);
         }
         this.closeDialog = function(value) {
@@ -163,7 +195,7 @@
             }
             return selected_view;
         }
-        var dialogApi = this;
+        var rcDialogApi = this;
         var selectedView = get_selected_view();
         angular.extend(this, rcDialogApiObj);
         this.dialog = rcDialogObj;
@@ -176,7 +208,7 @@
         }
         if (angular.isDefined(this.dialog.autoClose) && angular.isNumber(this.dialog.autoClose) && this.dialog.autoClose > 0) {
             $timeout(function() {
-                dialogApi.closeDialog();
+                rcDialogApi.closeDialog();
             }, this.dialog.autoClose);
         }
         this.closeDialog = function(value) {
@@ -185,7 +217,9 @@
             } else if (angular.isObject(value)) {
                 value.name = "close";
             }
-            $modalInstance.dismiss(value);
+            $modalInstance.dismiss({
+                $value: value
+            });
         };
         this.confirmDialog = function(value) {
             if (angular.isString(value)) {
@@ -193,7 +227,9 @@
             } else if (angular.isObject(value)) {
                 value.name = "confirm";
             }
-            $modalInstance.close(value);
+            $modalInstance.close({
+                $value: value
+            });
         };
         this.setSelectedView = function(value) {
             if (!this.selectedView) {
@@ -206,20 +242,52 @@
 (function(angular) {
     "use strict";
     var module = angular.module("rcDialog");
-    module.factory("rcDialogHelpers", [ "$rootScope", "$log", function($rootScope, $log) {
+    module.factory("rcDialogHelpers", [ "$rootScope", "$log", "$injector", "$document", "$window", function($rootScope, $log, $injector, $document, $window) {
+        function unique_id() {
+            return "dialog_" + Math.random().toString(36).substr(2, 16);
+        }
+        function _get_default_dialog() {
+            return {
+                id: unique_id(),
+                theme: "",
+                template: "",
+                templateUrl: "",
+                size: "large",
+                animation: true,
+                backdrop: true,
+                escClose: true,
+                clickClose: true,
+                autoClose: 0,
+                class: "",
+                testMode: false,
+                trigger: {
+                    type: undefined,
+                    val: 0,
+                    disabled: false
+                },
+                open: true
+            };
+        }
+        function _documentCheckScrollPercent(trigger_percent) {
+            var doc_height = angular.element($document).height() - angular.element($window).height();
+            var doc_quantum = parseFloat(doc_height / 100);
+            var current_percentage = parseInt(100 - (doc_height - angular.element($window).scrollTop()) / doc_quantum, 10);
+            return current_percentage >= trigger_percent;
+        }
         function _send_event(name, args) {
             name = "rcDialog:" + name;
-            $log.debug("RC Dialog send event: " + name);
-            $log.debug(args);
             angular.element(document.body).triggerHandler(name, args);
-            $rootScope.$broadcast("rcDialog:" + name, args);
+            $rootScope.$broadcast(name, args);
         }
         return {
+            getDefaultDialog: _get_default_dialog,
+            documentCheckScrollPercent: _documentCheckScrollPercent,
             sendEvent: _send_event
         };
     } ]);
-    module.factory("rcDialog", [ "$log", "$injector", "$timeout", "rcDialogHelpers", function($log, $injector, $timeout, rcDialogHelpers) {
+    module.factory("rcDialog", [ "$log", "$injector", "$q", "$timeout", "$window", "rcDialogHelpers", function($log, $injector, $q, $timeout, $window, rcDialogHelpers) {
         var modal = null;
+        var triggerHeightCheck = {};
         function _open_dialog_modal(dialog, data, dialog_api) {
             var width = null;
             var height = null;
@@ -270,7 +338,7 @@
                 },
                 preCloseCallback: function() {}
             };
-            if (angular.isDefined(dialog.template) && dialog.template !== "") {
+            if (angular.isString(dialog.template) && dialog.template.length) {
                 options.template = dialog.template;
                 options.plain = true;
             } else {
@@ -284,6 +352,7 @@
             }, function(close) {
                 rcDialogHelpers.sendEvent("close", close);
             });
+            return modal_instance;
         }
         function _open_bootstrap_modal(dialog, data, dialog_api) {
             var options = {
@@ -305,7 +374,7 @@
                     } ]
                 }
             };
-            if (angular.isDefined(dialog.template) && dialog.template !== "") {
+            if (angular.isString(dialog.template) && dialog.template.length) {
                 options.template = dialog.template;
             } else {
                 options.templateUrl = dialog.templateUrl;
@@ -321,6 +390,7 @@
             }, function(close) {
                 rcDialogHelpers.sendEvent("close", close);
             });
+            return modal_instance.result;
         }
         function _open_foundation_modal(dialog, data, dialog_api) {
             var options = {
@@ -342,7 +412,7 @@
                     } ]
                 }
             };
-            if (angular.isDefined(dialog.template) && dialog.template !== "") {
+            if (angular.isString(dialog.template) && dialog.template.length) {
                 options.template = dialog.template;
             } else {
                 options.templateUrl = dialog.templateUrl;
@@ -357,17 +427,20 @@
             }, function(close) {
                 rcDialogHelpers.sendEvent("close", close);
             });
+            return modal_instance.result;
         }
         function _open_modal(dialog, data, dialog_api) {
+            var deferred = $q.defer();
+            var result;
             switch (dialog.theme) {
               case "bootstrap":
                 try {
                     angular.module("ui.bootstrap");
                     modal = $injector.get("$uibModal");
-                    _open_bootstrap_modal(dialog, data, dialog_api);
+                    return _open_bootstrap_modal(dialog, data, dialog_api);
                 } catch (err) {
-                    $log.error('Error to open dialog with "ui.bootstrap".');
-                    $log.error(err);
+                    result.message = 'Error to open dialog with "ui.bootstrap".';
+                    result.error = err;
                 }
                 break;
 
@@ -375,10 +448,10 @@
                 try {
                     angular.module("mm.foundation");
                     modal = $injector.get("$modal");
-                    _open_foundation_modal(dialog, data, dialog_api);
+                    return _open_foundation_modal(dialog, data, dialog_api);
                 } catch (err) {
-                    $log.error('Error to open dialog with "mm.foundation".');
-                    $log.error(err);
+                    result.message = 'Error to open dialog with "mm.foundation".';
+                    result.error = err;
                 }
                 break;
 
@@ -386,16 +459,63 @@
                 try {
                     angular.module("ngDialog");
                     modal = $injector.get("ngDialog");
-                    _open_dialog_modal(dialog, data, dialog_api);
+                    return _open_dialog_modal(dialog, data, dialog_api);
                 } catch (err) {
-                    $log.error('Error to open dialog with "ngDialog".');
-                    $log.error(err);
+                    result.message = 'Error to open dialog with "ngDialog".';
+                    result.error = err;
                 }
             }
+            $log.error(result.message);
+            $log.error(result.error);
+            deferred.reject(result);
+            return deferred.promise;
         }
         return {
             open: function(dialog, data, dialog_api) {
-                _open_modal(dialog, data, dialog_api);
+                var deferred = $q.defer();
+                var promise = deferred.promise;
+                dialog = angular.extend({}, rcDialogHelpers.getDefaultDialog(), dialog);
+                if (dialog.open === true) {
+                    promise = _open_modal(dialog, data, dialog_api);
+                    return promise;
+                }
+                if (dialog.trigger.disabled === true) {
+                    deferred.reject(false);
+                    return promise;
+                }
+                switch (dialog.trigger.type) {
+                  case "seconds":
+                    var timeout_to_open = dialog.trigger.val * 1e3;
+                    $timeout(function() {
+                        promise = _open_modal(dialog, data, dialog_api);
+                    }, timeout_to_open);
+                    break;
+
+                  case "scroll":
+                    if (!triggerHeightCheck[dialog.id]) {
+                        triggerHeightCheck[dialog.id] = function() {
+                            if (rcDialogHelpers.documentCheckScrollPercent(dialog.trigger.val)) {
+                                angular.element($window).unbind("scroll", triggerHeightCheck[dialog.id]);
+                                promise = _open_modal(dialog, data, dialog_api);
+                            }
+                        };
+                        angular.element($window).bind("scroll", triggerHeightCheck[dialog.id]);
+                    }
+                    break;
+
+                  case "onload":
+                    promise = _open_modal(dialog, data, dialog_api);
+                    break;
+
+                  default:
+                    deferred.reject(false);
+                }
+                return promise;
+            },
+            destroy: function(dialog) {
+                if (triggerHeightCheck[dialog.id]) {
+                    angular.element($window).unbind("scroll", triggerHeightCheck[dialog.id]);
+                }
             }
         };
     } ]);

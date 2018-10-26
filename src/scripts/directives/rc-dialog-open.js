@@ -8,7 +8,7 @@
 
     module.directive( 'rcdOpen', ['rcDialog', function ( rcDialog ) {
         return {
-            restrict: "AC",
+            restrict: "EAC",
             replace: false,
             scope: {
                 rcdTemplate: '@',
@@ -22,6 +22,9 @@
                 rcdClass: '@',
                 rcdSelectedView: '=',
                 rcdData: '=?',
+                rcdTrigger: '@',
+                rcdTriggerValue: '@',
+                rcdTriggerDisabled: '<'
             },
             link: function ($scope, elem, attrs) {
 
@@ -34,9 +37,19 @@
                     backdrop:   angular.isDefined($scope.rcdBackdrop) ? $scope.rcdBackdrop : true,
                     escClose:   angular.isDefined($scope.rcdEscClose) ? $scope.rcdEscClose : true,
                     clickClose: angular.isDefined($scope.rcdClickClose) ? $scope.rcdClickClose : true,
-                    autoClose:  angular.isDefined($scope.rcdAutoClose)&& $scope.rcdAutoClose ? $scope.rcdAutoClose : 0,
-                    class:      angular.isDefined($scope.rcdClass) ? $scope.rcdClass : ''
+                    autoClose:  angular.isDefined($scope.rcdAutoClose)&& parseInt($scope.rcdAutoClose, 10) ? $scope.rcdAutoClose : 0,
+                    class:      angular.isDefined($scope.rcdClass) ? $scope.rcdClass : '',
+                    trigger: {
+                        type:   angular.isString($scope.rcdTrigger) ? $scope.rcdTrigger : undefined,
+                        val:    angular.isDefined($scope.rcdTriggerValue) ? parseInt($scope.rcdTriggerValue, 10) : 0,
+                        disabled: !$scope.rcdTriggerDisabled ? false : true
+                    },
+                    open: false
                 };
+
+                if (attrs.id) {
+                    dialog.id = attrs.id;
+                }
 
                 var data = angular.isDefined($scope.rcdData) ? $scope.rcdData : null;
 
@@ -44,10 +57,33 @@
                     selectedView:       angular.isDefined($scope.rcdSelectedView) ? $scope.rcdSelectedView : '',
                 };
 
+                //Open on click
                 elem.bind('click', function() {
-                    rcDialog.open(dialog, data, dialog_api);
+                    dialog.open = true;
+
+                    rcDialog.open(dialog, data, dialog_api).then(
+                        function(response) {console.log(response); console.log(dialog);},
+                        function (response) {console.log(response); console.log(dialog);}
+                    );
+
+                    dialog.open = false;
                 });
 
+                //Open on trriger
+                if (dialog.trigger.type) {
+                    rcDialog.open(dialog, data, dialog_api).then(
+                        function(response) {console.log(response); console.log(dialog);},
+                        function (response) {console.log(response); console.log(dialog);}
+                    );
+                }
+
+                /**
+                 * Destroy
+                 */
+                $scope.$on('$destroy', function handleDestroyEvent() {
+
+                    rcDialog.destroy(dialog);
+                });
             }
         };
     }]);

@@ -22,7 +22,7 @@
           return selected_view;
       }
 
-      var dialogApi = this;
+      var rcDialogApi = this;
       var selectedView = get_selected_view();
 
       angular.extend(this, rcDialogApiObj);
@@ -40,7 +40,7 @@
 
       if ( angular.isDefined(this.dialog.autoClose) && angular.isNumber(this.dialog.autoClose) && this.dialog.autoClose > 0 ) {
           $timeout(function () {
-              dialogApi.closeDialog();
+              rcDialogApi.closeDialog();
           }, this.dialog.autoClose);
       }
 
@@ -93,7 +93,7 @@
           return selected_view;
       }
 
-      var dialogApi = this;
+      var rcDialogApi = this;
       var selectedView = get_selected_view();
 
       angular.extend(this, rcDialogApiObj);
@@ -111,7 +111,7 @@
 
       if ( angular.isDefined(this.dialog.autoClose) && angular.isNumber(this.dialog.autoClose) && this.dialog.autoClose > 0 ) {
           $timeout(function () {
-              dialogApi.closeDialog();
+              rcDialogApi.closeDialog();
           }, this.dialog.autoClose);
       }
 
@@ -165,7 +165,7 @@
           return selected_view;
       }
 
-      var dialogApi = this;
+      var rcDialogApi = this;
       var selectedView = get_selected_view();
 
       angular.extend(this, rcDialogApiObj);
@@ -183,7 +183,7 @@
 
       if ( angular.isDefined(this.dialog.autoClose) && angular.isNumber(this.dialog.autoClose) && this.dialog.autoClose > 0 ) {
           $timeout(function () {
-              dialogApi.closeDialog();
+              rcDialogApi.closeDialog();
           }, this.dialog.autoClose);
       }
 
@@ -194,7 +194,8 @@
           else if ( angular.isObject(value) ) {
               value.name = 'close';
           }
-          $modalInstance.dismiss( value );
+
+          $modalInstance.dismiss( {$value: value} );
       };
 
       this.confirmDialog = function ( value ) {
@@ -204,7 +205,8 @@
         else if ( angular.isObject(value) ) {
             value.name = 'confirm';
         }
-        $modalInstance.close(value);
+
+        $modalInstance.close( {$value: value} );
       };
 
       this.setSelectedView = function ( value ) {

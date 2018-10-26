@@ -7,30 +7,73 @@
 
 
     //Dialog Helper
-    module.factory('rcDialogHelpers', [ '$rootScope', '$log', function($rootScope, $log) {
+    module.factory('rcDialogHelpers', [ '$rootScope', '$log', '$injector', '$document', '$window', function($rootScope, $log, $injector, $document, $window) {
+
+        /**
+         * Generate unique id
+         *
+         * @returns {string}
+         */
+        function unique_id () {
+            return 'dialog_' + Math.random().toString(36).substr(2, 16);
+        }
+
+
+        function _get_default_dialog () {
+
+            return {
+                id:         unique_id(),
+                theme:      '',
+                template:   '',
+                templateUrl: '',
+                size:       'large',
+                animation:  true,
+                backdrop:   true,
+                escClose:   true,
+                clickClose: true,
+                autoClose:  0,
+                class:      '',
+                testMode : false,
+                trigger: {
+                    type:   undefined,
+                    val:    0,
+                    disabled: false
+                },
+                open: true
+            };
+        }
+
+        //Height document on percent check
+        function _documentCheckScrollPercent ( trigger_percent ) {
+
+            var doc_height = angular.element($document).height() - angular.element($window).height();
+            var doc_quantum = parseFloat(doc_height / 100);
+
+            var current_percentage = parseInt(100 - ((doc_height - angular.element($window).scrollTop()) / doc_quantum), 10);
+
+            return (current_percentage >= trigger_percent);
+        }
 
         //Send event notify
         function _send_event( name, args ) {
             name = 'rcDialog:' + name;
 
-            $log.debug('RC Dialog send event: ' + name);
-            $log.debug(args);
-
             angular.element(document.body).triggerHandler( name, args);
-            $rootScope.$broadcast('rcDialog:' + name, args);
+            $rootScope.$broadcast(name, args);
         }
 
-
         return {
-            sendEvent: _send_event
+            getDefaultDialog:           _get_default_dialog,
+            documentCheckScrollPercent: _documentCheckScrollPercent,
+            sendEvent:                  _send_event,
         };
     }]);
 
     //Dialog Service
-    module.factory('rcDialog', [ '$log', '$injector', '$timeout', 'rcDialogHelpers', function ( $log, $injector, $timeout, rcDialogHelpers ) {
+    module.factory('rcDialog', [ '$log', '$injector', '$q', '$timeout', '$window', 'rcDialogHelpers', function ( $log, $injector, $q, $timeout, $window, rcDialogHelpers ) {
 
             var modal = null;
-
+            var triggerHeightCheck = {};
 
             function _open_dialog_modal( dialog, data, dialog_api ) {
 
@@ -84,7 +127,7 @@
                     }
                 };
 
-                if ( angular.isDefined(dialog.template) && dialog.template !== '' ) {
+                if ( angular.isString(dialog.template) && dialog.template.length ) {
                     options.template = dialog.template;
                     options.plain = true;
                 }
@@ -106,6 +149,7 @@
                     }
                 );
 
+                return modal_instance;
             }
 
 
@@ -132,7 +176,7 @@
                     }
                 };
 
-                if ( angular.isDefined(dialog.template) && dialog.template !== '' ) {
+                if ( angular.isString(dialog.template) && dialog.template.length ) {
                     options.template = dialog.template;
                 }
                 else {
@@ -158,6 +202,8 @@
                         rcDialogHelpers.sendEvent('close', close);
                     }
                 );
+
+                return modal_instance.result;
             }
 
             //Foundation Modal
@@ -183,7 +229,7 @@
                     }
                 };
 
-                if ( angular.isDefined(dialog.template) && dialog.template !== '' ) {
+                if ( angular.isString(dialog.template) && dialog.template.length ) {
                     options.template = dialog.template;
                 }
                 else {
@@ -207,11 +253,16 @@
                         rcDialogHelpers.sendEvent('close', close);
                     }
                 );
+
+                return modal_instance.result;
             }
 
 
             //Open new dialog
             function _open_modal( dialog, data, dialog_api ) {
+
+                var deferred = $q.defer();
+                var result;
 
                 switch ( dialog.theme ) {
                     case 'bootstrap':
@@ -219,11 +270,11 @@
                             angular.module('ui.bootstrap');
                             modal = $injector.get('$uibModal');
 
-                            _open_bootstrap_modal( dialog, data, dialog_api );
+                            return _open_bootstrap_modal( dialog, data, dialog_api );
                         }
                         catch(err) {
-                            $log.error('Error to open dialog with "ui.bootstrap".');
-                            $log.error(err);
+                            result.message = 'Error to open dialog with "ui.bootstrap".';
+                            result.error = err;
                         }
                         break;
                     case 'foundation':
@@ -231,11 +282,11 @@
                             angular.module('mm.foundation');
                             modal = $injector.get('$modal');
 
-                            _open_foundation_modal( dialog, data, dialog_api );
+                            return _open_foundation_modal( dialog, data, dialog_api );
                         }
                         catch(err) {
-                            $log.error('Error to open dialog with "mm.foundation".');
-                            $log.error(err);
+                            result.message = 'Error to open dialog with "mm.foundation".';
+                            result.error = err;
                         }
                         break;
                     default:
@@ -243,19 +294,81 @@
                             angular.module('ngDialog');
                             modal = $injector.get('ngDialog');
 
-                            _open_dialog_modal( dialog, data, dialog_api );
+                            return _open_dialog_modal( dialog, data, dialog_api );
                         }
                         catch(err) {
-                            $log.error('Error to open dialog with "ngDialog".');
-                            $log.error(err);
+                            result.message = 'Error to open dialog with "ngDialog".';
+                            result.error = err;
                         }
                 }
 
+                $log.error(result.message);
+                $log.error(result.error);
+
+                deferred.reject(result);
+
+                return deferred.promise;
             }
 
             return {
                 open: function ( dialog, data, dialog_api ) {
-                    _open_modal( dialog, data, dialog_api );
+
+                    var deferred = $q.defer();
+                    var promise = deferred.promise;
+
+                    dialog = angular.extend({}, rcDialogHelpers.getDefaultDialog(), dialog);
+
+                    if (dialog.open === true) {
+                        promise = _open_modal( dialog, data, dialog_api );
+
+                        return promise;
+                    }
+
+                    if (dialog.trigger.disabled === true) {
+                        deferred.reject(false);
+
+                        return promise;
+                    }
+
+                    switch ( dialog.trigger.type ) {
+                        case 'seconds':
+                            var timeout_to_open = dialog.trigger.val * 1000;
+
+                            $timeout(function () {
+                                promise = _open_modal( dialog, data, dialog_api );
+                            }, timeout_to_open);
+
+                            break;
+                        case 'scroll':
+
+                            //Add event on scroll
+                            if (!triggerHeightCheck[dialog.id]) {
+
+                                //Trigger on scroll
+                                triggerHeightCheck[dialog.id] = function(){
+
+                                    if (rcDialogHelpers.documentCheckScrollPercent( dialog.trigger.val ) ) {
+                                        angular.element($window).unbind('scroll', triggerHeightCheck[dialog.id]);
+                                        promise = _open_modal( dialog, data, dialog_api );
+                                    }
+                                };
+
+                                angular.element($window).bind('scroll', triggerHeightCheck[dialog.id]);
+                            }
+                            break;
+                        case 'onload':
+                            promise = _open_modal( dialog, data, dialog_api );
+                            break;
+                        default:
+                            deferred.reject(false);
+                    }
+
+                    return promise;
+                },
+                destroy: function (dialog) {
+                    if (triggerHeightCheck[dialog.id]) {
+                        angular.element($window).unbind('scroll', triggerHeightCheck[dialog.id]);
+                    }
                 }
             };
 
