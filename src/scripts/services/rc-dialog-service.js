@@ -138,7 +138,7 @@
 
                 options.appendClassName = 'rc-dialog ' + dialog.class;
 
-                options = angular.extend(dialog.themeOptions, options);
+                angular.extend(options, dialog.themeOptions);
 
                 var modal_instance = modal.openConfirm( options );
 
@@ -193,7 +193,7 @@
                 options.windowClass = 'rc-dialog-uibdialog ' + dialog.class;
                 options.backdropClass = 'rc-dialog-uibdialog-backdrop ' + dialog.class;
 
-                options = angular.extend(dialog.themeOptions, options);
+                angular.extend(options, dialog.themeOptions);
 
                 //Modal Open
                 var modal_instance = modal.open( options );
@@ -246,7 +246,7 @@
 
                 options.windowClass = 'rc-dialog-zfdialog ' + dialog.class;
 
-                options = angular.extend(dialog.themeOptions, options);
+                angular.extend(options, dialog.themeOptions);
 
                 //Modal Open
                 var modal_instance = modal.open( options );

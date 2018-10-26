@@ -354,7 +354,7 @@
                 options.plain = false;
             }
             options.appendClassName = "rc-dialog " + dialog.class;
-            options = angular.extend(dialog.themeOptions, options);
+            angular.extend(options, dialog.themeOptions);
             var modal_instance = modal.openConfirm(options);
             modal_instance.then(function(confirm) {
                 rcDialogHelpers.sendEvent("confirm", confirm);
@@ -393,7 +393,7 @@
             }
             options.windowClass = "rc-dialog-uibdialog " + dialog.class;
             options.backdropClass = "rc-dialog-uibdialog-backdrop " + dialog.class;
-            options = angular.extend(dialog.themeOptions, options);
+            angular.extend(options, dialog.themeOptions);
             var modal_instance = modal.open(options);
             modal_instance.result.then(function(confirm) {
                 rcDialogHelpers.sendEvent("confirm", confirm);
@@ -431,7 +431,7 @@
                 options.backdrop = "static";
             }
             options.windowClass = "rc-dialog-zfdialog " + dialog.class;
-            options = angular.extend(dialog.themeOptions, options);
+            angular.extend(options, dialog.themeOptions);
             var modal_instance = modal.open(options);
             modal_instance.result.then(function(confirm) {
                 rcDialogHelpers.sendEvent("confirm", confirm);
