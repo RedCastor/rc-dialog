@@ -33,6 +33,11 @@ angular('yourAngularApp',['rcDialog', 'ngDialog', 'ui.bootstrap', 'mm.foundation
 - **rcd-data** = Pass data to modal content. 
   Access in your template with "rcDialogApi.data". 
   Access to your params modal in template with "rcDialogApi.dialog"
+- **rcd-trigger** = Open dialog trigger (onload, scroll, seconds),
+- **rcd-trigger-value** = Trigger value for scroll is percentage and seconds is the number of seconds to open,
+- **rcd-trigger-disabled** = Disabled trigger on condition,
+- **on-confirm** = Attach function on dialog close confirm.
+- **on-close** = Attach function on dialog close.  
 
 
 <h4>Usage/Example</h4>

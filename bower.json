@@ -1,6 +1,6 @@
 {
   "name": "rc-dialog",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "homepage": "https://redcastor.io",
   "authors": [
     "Auban le Grelle"
@@ -15,8 +15,7 @@
     "modal"
   ],
   "main": [
-    "dist/rc-dialog.js",
-    "dist/rc-dialog.css"
+    "dist/rc-dialog.js"
   ],
   "ignore": [
     "**/.*",
