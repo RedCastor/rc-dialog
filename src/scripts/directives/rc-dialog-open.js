@@ -67,7 +67,12 @@
 
                     rcDialog.open(dialog, data, dialog_api).then(
                         function(response) { $scope.onConfirm({$confirm: response}); },
-                        function (response) { $scope.onClose({$close: response}); }
+                        function (response) {
+                            //Response is false on dialog not opened
+                            if (response !== false) {
+                                $scope.onClose({$close: response});
+                            }
+                        }
                     );
 
                     dialog.open = false;
@@ -77,7 +82,12 @@
                 if (dialog.trigger.type) {
                     rcDialog.open(dialog, data, dialog_api).then(
                         function(response) { $scope.onConfirm({$confirm: response}); },
-                        function (response) { $scope.onClose({$close: response}); }
+                        function (response) {
+                            //Response is false on dialog not opened
+                            if (response !== false) {
+                                $scope.onClose({$close: response});
+                            }
+                        }
                     );
                 }
 

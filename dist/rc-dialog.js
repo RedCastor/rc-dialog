@@ -63,9 +63,11 @@
                             $confirm: response
                         });
                     }, function(response) {
-                        $scope.onClose({
-                            $close: response
-                        });
+                        if (response !== false) {
+                            $scope.onClose({
+                                $close: response
+                            });
+                        }
                     });
                     dialog.open = false;
                 });
@@ -75,9 +77,11 @@
                             $confirm: response
                         });
                     }, function(response) {
-                        $scope.onClose({
-                            $close: response
-                        });
+                        if (response !== false) {
+                            $scope.onClose({
+                                $close: response
+                            });
+                        }
                     });
                 }
                 $scope.$on("$destroy", function handleDestroyEvent() {
