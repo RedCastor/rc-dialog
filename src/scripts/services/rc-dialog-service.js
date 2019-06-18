@@ -363,7 +363,9 @@
                             }
                             break;
                         case 'onload':
-                            promise = _open_modal( dialog, data, dialog_api );
+                            $timeout(function () {
+                                promise = _open_modal( dialog, data, dialog_api );
+                            }, 0);
                             break;
                         default:
                             deferred.reject(false);

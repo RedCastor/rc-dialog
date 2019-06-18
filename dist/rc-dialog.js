@@ -58,18 +58,22 @@
                 };
                 elem.bind("click", function() {
                     dialog.open = true;
+                    if (dialog.open) {
+                        return;
+                    }
                     rcDialog.open(dialog, data, dialog_api).then(function(response) {
                         $scope.onConfirm({
                             $confirm: response
                         });
+                        dialog.open = false;
                     }, function(response) {
                         if (response !== false) {
                             $scope.onClose({
                                 $close: response
                             });
                         }
+                        dialog.open = false;
                     });
-                    dialog.open = false;
                 });
                 if (dialog.trigger.type) {
                     rcDialog.open(dialog, data, dialog_api).then(function(response) {
@@ -519,7 +523,9 @@
                     break;
 
                   case "onload":
-                    promise = _open_modal(dialog, data, dialog_api);
+                    $timeout(function() {
+                        promise = _open_modal(dialog, data, dialog_api);
+                    }, 0);
                     break;
 
                   default:

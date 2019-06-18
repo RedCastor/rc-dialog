@@ -65,17 +65,24 @@
                 elem.bind('click', function() {
                     dialog.open = true;
 
+                    if (dialog.open) {
+                        return;
+                    }
+
                     rcDialog.open(dialog, data, dialog_api).then(
-                        function(response) { $scope.onConfirm({$confirm: response}); },
+                        function(response) {
+                            $scope.onConfirm({$confirm: response});
+                            dialog.open = false;
+                        },
                         function (response) {
                             //Response is false on dialog not opened
                             if (response !== false) {
                                 $scope.onClose({$close: response});
                             }
+
+                            dialog.open = false;
                         }
                     );
-
-                    dialog.open = false;
                 });
 
                 //Open on trriger
