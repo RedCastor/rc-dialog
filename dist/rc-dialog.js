@@ -46,8 +46,7 @@
                         type: angular.isString($scope.rcdTrigger) ? $scope.rcdTrigger : undefined,
                         val: angular.isDefined($scope.rcdTriggerValue) ? parseInt($scope.rcdTriggerValue, 10) : 0,
                         disabled: !$scope.rcdTriggerDisabled ? false : true
-                    },
-                    open: false
+                    }
                 };
                 if (attrs.id) {
                     dialog.id = attrs.id;
@@ -57,22 +56,20 @@
                     selectedView: angular.isDefined($scope.rcdSelectedView) ? $scope.rcdSelectedView : ""
                 };
                 elem.bind("click", function() {
-                    dialog.open = true;
                     if (dialog.open) {
                         return;
                     }
+                    dialog.open = true;
                     rcDialog.open(dialog, data, dialog_api).then(function(response) {
                         $scope.onConfirm({
                             $confirm: response
                         });
-                        dialog.open = false;
                     }, function(response) {
                         if (response !== false) {
                             $scope.onClose({
                                 $close: response
                             });
                         }
-                        dialog.open = false;
                     });
                 });
                 if (dialog.trigger.type) {
@@ -280,8 +277,7 @@
                     type: undefined,
                     val: 0,
                     disabled: false
-                },
-                open: true
+                }
             };
         }
         function _documentCheckScrollPercent(trigger_percent) {
@@ -365,8 +361,10 @@
             angular.extend(options, dialog.themeOptions);
             var modal_instance = modal.openConfirm(options);
             modal_instance.then(function(confirm) {
+                dialog.open = false;
                 rcDialogHelpers.sendEvent("confirm", confirm);
             }, function(close) {
+                dialog.open = false;
                 rcDialogHelpers.sendEvent("close", close);
             });
             return modal_instance;
@@ -404,8 +402,10 @@
             angular.extend(options, dialog.themeOptions);
             var modal_instance = modal.open(options);
             modal_instance.result.then(function(confirm) {
+                dialog.open = false;
                 rcDialogHelpers.sendEvent("confirm", confirm);
             }, function(close) {
+                dialog.open = false;
                 rcDialogHelpers.sendEvent("close", close);
             });
             return modal_instance.result;
@@ -442,8 +442,10 @@
             angular.extend(options, dialog.themeOptions);
             var modal_instance = modal.open(options);
             modal_instance.result.then(function(confirm) {
+                dialog.open = false;
                 rcDialogHelpers.sendEvent("confirm", confirm);
             }, function(close) {
+                dialog.open = false;
                 rcDialogHelpers.sendEvent("close", close);
             });
             return modal_instance.result;
@@ -451,6 +453,7 @@
         function _open_modal(dialog, data, dialog_api) {
             var deferred = $q.defer();
             var result = {};
+            dialog.open = true;
             switch (dialog.theme) {
               case "bootstrap":
                 try {
@@ -486,6 +489,7 @@
             }
             $log.error(result.message);
             $log.error(result.error);
+            dialog.open = false;
             deferred.reject(result);
             return deferred.promise;
         }
@@ -493,8 +497,9 @@
             open: function(dialog, data, dialog_api) {
                 var deferred = $q.defer();
                 var promise = deferred.promise;
-                dialog = angular.extend({}, rcDialogHelpers.getDefaultDialog(), dialog);
-                if (dialog.open === true) {
+                var dialog_prams = angular.extend(rcDialogHelpers.getDefaultDialog(), dialog);
+                angular.extend(dialog, dialog_prams);
+                if (dialog.open === true || dialog.open === undefined && !dialog.trigger.type) {
                     promise = _open_modal(dialog, data, dialog_api);
                     return promise;
                 }
@@ -505,8 +510,8 @@
                 switch (dialog.trigger.type) {
                   case "seconds":
                     var timeout_to_open = dialog.trigger.val * 1e3;
-                    $timeout(function() {
-                        promise = _open_modal(dialog, data, dialog_api);
+                    promise = $timeout(function() {
+                        return _open_modal(dialog, data, dialog_api);
                     }, timeout_to_open);
                     break;
 
@@ -523,8 +528,8 @@
                     break;
 
                   case "onload":
-                    $timeout(function() {
-                        promise = _open_modal(dialog, data, dialog_api);
+                    promise = $timeout(function() {
+                        return _open_modal(dialog, data, dialog_api);
                     }, 0);
                     break;
 

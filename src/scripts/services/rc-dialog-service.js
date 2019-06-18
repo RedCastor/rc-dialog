@@ -38,8 +38,7 @@
                     type:   undefined,
                     val:    0,
                     disabled: false
-                },
-                open: true
+                }
             };
         }
 
@@ -144,9 +143,11 @@
 
                 modal_instance.then(
                     function (confirm) {
+                        dialog.open = false;
                         rcDialogHelpers.sendEvent('confirm', confirm);
                     },
                     function (close) {
+                        dialog.open = false;
                         rcDialogHelpers.sendEvent('close', close);
                     }
                 );
@@ -200,9 +201,11 @@
 
                 modal_instance.result.then(
                     function (confirm) {
+                        dialog.open = false;
                         rcDialogHelpers.sendEvent('confirm', confirm);
                     },
                     function (close) {
+                        dialog.open = false;
                         rcDialogHelpers.sendEvent('close', close);
                     }
                 );
@@ -253,9 +256,11 @@
 
                 modal_instance.result.then(
                     function (confirm) {
+                        dialog.open = false;
                         rcDialogHelpers.sendEvent('confirm', confirm);
                     },
                     function (close) {
+                        dialog.open = false;
                         rcDialogHelpers.sendEvent('close', close);
                     }
                 );
@@ -269,6 +274,8 @@
 
                 var deferred = $q.defer();
                 var result = {};
+
+                dialog.open = true;
 
                 switch ( dialog.theme ) {
                     case 'bootstrap':
@@ -311,6 +318,7 @@
                 $log.error(result.message);
                 $log.error(result.error);
 
+                dialog.open = false;
                 deferred.reject(result);
 
                 return deferred.promise;
@@ -321,10 +329,12 @@
 
                     var deferred = $q.defer();
                     var promise = deferred.promise;
+                    var dialog_prams = angular.extend(rcDialogHelpers.getDefaultDialog(), dialog);
 
-                    dialog = angular.extend({}, rcDialogHelpers.getDefaultDialog(), dialog);
+                    angular.extend(dialog, dialog_prams);
 
-                    if (dialog.open === true) {
+                    if (dialog.open === true || (dialog.open === undefined && !dialog.trigger.type)) {
+
                         promise = _open_modal( dialog, data, dialog_api );
 
                         return promise;
@@ -340,8 +350,8 @@
                         case 'seconds':
                             var timeout_to_open = dialog.trigger.val * 1000;
 
-                            $timeout(function () {
-                                promise = _open_modal( dialog, data, dialog_api );
+                            promise = $timeout(function() {
+                                return _open_modal( dialog, data, dialog_api );
                             }, timeout_to_open);
 
                             break;
@@ -363,8 +373,8 @@
                             }
                             break;
                         case 'onload':
-                            $timeout(function () {
-                                promise = _open_modal( dialog, data, dialog_api );
+                            promise = $timeout(function() {
+                                return _open_modal( dialog, data, dialog_api );
                             }, 0);
                             break;
                         default:

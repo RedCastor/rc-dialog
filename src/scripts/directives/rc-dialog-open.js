@@ -47,8 +47,7 @@
                         type:   angular.isString($scope.rcdTrigger) ? $scope.rcdTrigger : undefined,
                         val:    angular.isDefined($scope.rcdTriggerValue) ? parseInt($scope.rcdTriggerValue, 10) : 0,
                         disabled: !$scope.rcdTriggerDisabled ? false : true
-                    },
-                    open: false
+                    }
                 };
 
                 if (attrs.id) {
@@ -63,24 +62,22 @@
 
                 //Open on click
                 elem.bind('click', function() {
-                    dialog.open = true;
 
                     if (dialog.open) {
                         return;
                     }
 
+                    dialog.open = true;
+
                     rcDialog.open(dialog, data, dialog_api).then(
                         function(response) {
                             $scope.onConfirm({$confirm: response});
-                            dialog.open = false;
                         },
                         function (response) {
                             //Response is false on dialog not opened
                             if (response !== false) {
                                 $scope.onClose({$close: response});
                             }
-
-                            dialog.open = false;
                         }
                     );
                 });
@@ -88,7 +85,9 @@
                 //Open on trriger
                 if (dialog.trigger.type) {
                     rcDialog.open(dialog, data, dialog_api).then(
-                        function(response) { $scope.onConfirm({$confirm: response}); },
+                        function(response) {
+                            $scope.onConfirm({$confirm: response});
+                        },
                         function (response) {
                             //Response is false on dialog not opened
                             if (response !== false) {
