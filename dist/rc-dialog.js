@@ -26,6 +26,7 @@
                 rcdTrigger: "@",
                 rcdTriggerValue: "@",
                 rcdTriggerDisabled: "<",
+                rcdOn: "@?",
                 onConfirm: "&rcdOnConfirm",
                 onClose: "&rcdOnClose"
             },
@@ -52,10 +53,11 @@
                     dialog.id = attrs.id;
                 }
                 var data = angular.isDefined($scope.rcdData) ? $scope.rcdData : null;
+                var event = angular.isDefined($scope.rcdOn) ? $scope.rcdOn : "click";
                 var dialog_api = {
                     selectedView: angular.isDefined($scope.rcdSelectedView) ? $scope.rcdSelectedView : ""
                 };
-                elem.bind("click", function() {
+                elem.on(event, function() {
                     if (dialog.open) {
                         return;
                     }
